@@ -1,15 +1,18 @@
 package com.procesos.negocios.sergio.controllers;
 
 import com.procesos.negocios.sergio.models.Usuario;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import com.procesos.negocios.sergio.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
 @RestController
 
 public class UsuarioController {
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @GetMapping(value = "/usuario/{id}")
     public Usuario getUsuario(@PathVariable Long id){
@@ -24,4 +27,9 @@ public class UsuarioController {
         return usuario;
     }
 
+    @PostMapping("/usuario")
+    public Usuario crearUsuario(@RequestBody Usuario usuario){
+        usuarioRepository.save(usuario);
+        return usuario;
+    }
 }
