@@ -76,19 +76,23 @@ public class UsuarioController {
 
     @PutMapping("/usuario/{id}")
     public ResponseEntity editarUsuario(@PathVariable Long id, @RequestBody Usuario usuario){
-        Usuario usuarioBD = usuarioRepository.findById(id).get();
-        try{
-            usuarioBD.setNombre(usuario.getNombre());
-            usuarioBD.setApellido(usuario.getApellido());
-            usuarioBD.setDireccion(usuario.getDireccion());
-            usuarioBD.setDocumento(usuario.getDocumento());
-            usuarioBD.setFechaNacimiento(usuario.getFechaNacimiento());
-            usuarioBD.setTelefono(usuario.getTelefono());
-            usuarioRepository.save(usuarioBD);
-            return new ResponseEntity(usuario, HttpStatus.OK);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().build();
+        Optional<Usuario> usuarioBD = usuarioRepository.findById(id);
+        if (usuarioBD.isPresent()) {
+            try {
+                usuarioBD.get().setNombre(usuario.getNombre());
+                usuarioBD.get().setApellido(usuario.getApellido());
+                usuarioBD.get().setDireccion(usuario.getDireccion());
+                usuarioBD.get().setDocumento(usuario.getDocumento());
+                usuarioBD.get().setFechaNacimiento(usuario.getFechaNacimiento());
+                usuarioBD.get().setTelefono(usuario.getTelefono());
+                usuarioRepository.save(usuarioBD.get());
+                return new ResponseEntity(usuario, HttpStatus.OK);
+            }catch (Exception e){
+                return ResponseEntity.badRequest().build();
+            }
         }
+            return ResponseEntity.badRequest().build();
+
     }
 
     @DeleteMapping("usuario/{id}")
