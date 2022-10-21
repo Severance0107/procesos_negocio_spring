@@ -7,11 +7,13 @@ import com.procesos.negocios.sergio.services.UsuarioServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import javax.validation.Valid;
+import java.util.*;
 
 @RestController
 
@@ -26,7 +28,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/usuario")
-    public ResponseEntity crearUsuario(@RequestBody Usuario usuario){
+    public ResponseEntity crearUsuario(@Valid @RequestBody Usuario usuario){
         return usuarioService.createUser(usuario);
     }
 
@@ -52,12 +54,25 @@ public class UsuarioController {
 
 
     @PutMapping("/usuario/{id}")
-    public ResponseEntity editarUsuario(@PathVariable Long id, @RequestBody Usuario usuario){
+    public ResponseEntity editarUsuario(@Valid @PathVariable Long id, @RequestBody Usuario usuario){
         return usuarioService.editUser(id, usuario);
     }
 
     @DeleteMapping("usuario/{id}")
     public ResponseEntity eliminarUsuario(@PathVariable Long id){
         return usuarioService.deleteUserById(id);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }
